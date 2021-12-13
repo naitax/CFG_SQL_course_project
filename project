@@ -1,0 +1,210 @@
+create database Recipe;
+
+use Recipe;
+
+-- difficulty table--
+CREATE TABLE difficulty (difficulty_id INTEGER PRIMARY KEY NOT NULL, difficulty varchar(50));
+
+-- cuisine table --
+CREATE TABLE cuisine (cuisine_id INTEGER PRIMARY KEY NOT NULL, cuisine varchar(50));
+
+-- course table -- 
+CREATE TABLE course (course_id INTEGER PRIMARY KEY NOT NULL, course varchar(50));
+
+-- diet table --
+CREATE TABLE diet(diet_id INTEGER PRIMARY KEY NOT NULL, diet varchar(50));
+
+-- instructions table --
+CREATE TABLE instructions (instruction_id INTEGER PRIMARY KEY NOT NULL, instructions TEXT);
+
+-- ingredient table --
+CREATE TABLE ingredient(ingredient_id INTEGER PRIMARY KEY NOT NULL, ingredient TEXT);
+
+-- quantity table --
+CREATE TABLE quantity (quantity_id INTEGER PRIMARY KEY NOT NULL, quantity INTEGER);
+
+-- recipe table --
+CREATE TABLE recipe 
+	(recipe_id INTEGER PRIMARY KEY NOT NULL, 
+	recipe_name TEXT, 
+	recipe_notes TEXT,
+	difficulty_id INTEGER,
+	cuisine_id INTEGER,
+	course_id INTEGER,
+	diet_id INTEGER,
+	instructions_id INTEGER,
+	FOREIGN KEY (difficulty_id) REFERENCES difficulty(difficulty_id),
+	FOREIGN KEY (cuisine_id) REFERENCES cuisine(cuisine_id),
+	FOREIGN KEY (course_id) REFERENCES course(course_id),
+	FOREIGN KEY (diet_id) REFERENCES diet(diet_id),
+	FOREIGN KEY (instructions_id) REFERENCES instructions(instruction_id));
+    
+-- recipe ingredient table --
+CREATE TABLE recipe_ingredient
+	(recipe_id INTEGER,
+	ingredient_id INTEGER,
+	quantity_id INTEGER,
+	FOREIGN KEY (recipe_id) REFERENCES recipe(recipe_id),
+	FOREIGN KEY (ingredient_id) REFERENCES ingredient(ingredient_id),
+	FOREIGN KEY (quantity_id) REFERENCES quantity(quantity_id));
+    
+    
+    
+-- insert values to tables --
+INSERT INTO difficulty (difficulty_id, difficulty) VALUES (1, "easy"), (2, "average"), (3, "difficult");
+
+INSERT INTO course (course_id, course) VALUES (1, "appetizer"), (2, "soup"), (3, "main"), (4, "dessert");
+
+INSERT INTO diet (diet_id, diet) VALUES (1, "None"), (2, "Vegan"), (3, "Vegetarian"), (4, "Gluten-free"), (5, "Low-Carb Diets"), (6, "Paleo Diet"), (7, "Dukan Diet");
+
+INSERT INTO cuisine(cuisine_id, cuisine) VALUES (1, "Caribbean"), (2, "Vietnamese"), (3, "Korean"), (4, "German"), (5, "Indian"), (6, "Italian"), (7, "American"), (8, "French");
+
+INSERT INTO ingredient(ingredient_id, ingredient) VALUES (1, "flour"), (2, "egg"), (3, "milk"), (4, "oil"), (5, "sugar");
+
+   
+INSERT INTO instructions(instruction_id, instructions) 
+VALUES 
+(1, 
+"STEP 1. Put 100g plain flour, 2 large eggs, 300ml milk, 1 tbsp sunflower or vegetable oil and a pinch of salt into a bowl or large jug, then whisk to a smooth batter. 
+STEP 2. Set aside for 30 mins to rest if you have time, or start cooking straight away.
+STEP 3. Set a medium frying pan or crêpe pan over a medium heat and carefully wipe it with some oiled kitchen paper.
+STEP 4. When hot, cook your pancakes for 1 min on each side until golden, keeping them warm in a low oven as you go.");
+
+INSERT INTO recipe(recipe_id, recipe_name, recipe_notes, difficulty_id, cuisine_id, course_id, diet_id, instructions_id) VALUES 
+(1, "Pancakes", "Easy and fast pancakes", 1, 7, 3, 1, 1);
+
+
+
+INSERT INTO recipe_ingredient (recipe_id, ingredient_id, quantity_id) VALUES
+(1, 1, NULL),
+(1, 2, NULL),
+(1, 3, NULL),
+(1, 4, NULL),
+(1, 5, NULL);
+
+
+              
+              
+INSERT INTO ingredient(ingredient_id, ingredient) 
+VALUES 
+(6, "olive oil"), 
+(7, "onion"), 
+(8, "garlic"), 
+(9, "chorizo"), 
+(10, "cans chopped tomatoes"), 
+(11, "caster sugar"),
+(12, "gnocchi"),
+(13, "mozarella ball"),
+(14, "salt"),
+(15, "baking powder"),
+(16, "vegan vegetable spread"),
+(17, "soy milk"),
+(18, "jam"),
+(19, "vegan cream alternative, e.g. oat-based crème fraîche");
+
+INSERT INTO instructions(instruction_id, instructions) 
+VALUES 
+(2,
+"STEP 1. Heat the oil in a medium pan over a medium heat. Fry the onion and garlic for 8-10 mins until soft. Add the chorizo and fry for 5 mins more. Tip in the tomatoes and sugar, and season. Bring to a simmer, then add the gnocchi and cook for 8 mins, stirring often, until soft. Heat the grill to high.
+STEP 2.Stir ¾ of the mozzarella and most of the basil through the gnocchi. Divide the mixture between six ovenproof ramekins, or put in one baking dish. Top with the remaining mozzarella, then grill for 3 mins, or until the cheese is melted and golden. Season, scatter over the remaining basil and serve with green salad."),
+(3, 
+"STEP 1. Mix the flour, salt, baking pemployeesowder and sugar in a bowl. Rub in the vegetable spread until you have fine breadcrumbs. You can also gradually pulse it in a food processor until it resembles breadcrumbs. 
+STEP 2. Gradually stir the milk into the flour mixture until you have a smooth dough. 
+STEP 3. Lightly dust your surface with flour and gently roll out the scone dough until 2cm thick. Transfer onto a baking tray lined with parchment and put it in the fridge for 30 mins to firm up."); 
+
+
+INSERT INTO recipe(recipe_id, recipe_name, recipe_notes, difficulty_id, cuisine_id, course_id, diet_id, instructions_id) 
+VALUES
+(2, "Chorizo & mozzarella gnocchi bake", "Upgrade cheesy tomato pasta with gnocchi, chorizo and mozzarella for a comforting bake that makes an excellent midweek meal", 1, 6, 3, 1, 2),
+(3, "Vegan scones", "Vegan version of scones, which uses soy milk and vegan vegetable spread to replace the dairy.", 2, 7, 1, 2, 3); 
+
+INSERT INTO recipe_ingredient (recipe_id, ingredient_id, quantity_id) VALUES
+(2, 6, NULL),
+(2, 7, NULL),
+(2, 8, NULL),
+(2, 9, NULL),
+(2, 10, NULL),
+(2, 11, NULL),
+(2, 12, NULL),
+(2, 13, NULL),
+(3, 1, NULL),
+(3, 14, NULL),
+(3, 15, NULL),
+(3, 11, NULL),
+(3, 16, NULL),
+(3, 17, NULL),
+(3, 18, NULL),
+(3, 19, NULL);
+    
+-- stored function -- 
+DELIMITER $$
+
+CREATE FUNCTION newTime(
+	difficulty varchar(50)
+) 
+RETURNS VARCHAR(60)
+DETERMINISTIC
+BEGIN
+    DECLARE recipe_time VARCHAR(60);
+
+    IF difficulty = "easy" THEN
+		SET recipe_time = "15-30 min";
+    ELSEIF difficulty = "average" THEN
+        SET recipe_time = "30-60 min";
+    ELSEIF difficulty = "difficult" THEN
+        SET recipe_time = "more than 60 min";
+    END IF;
+	-- return estimated time
+	RETURN (recipe_time);
+END$$
+DELIMITER ;
+
+
+ALTER TABLE recipe
+ADD COLUMN recipe_time VARCHAR(60) after difficulty_id;
+
+ALTER TABLE difficulty
+ADD COLUMN recipe_time VARCHAR(60) after difficulty;
+
+-- use of stored function -- 
+SELECT 
+    difficulty_id, difficulty, newTime(difficulty)
+FROM
+    difficulty
+ORDER BY 
+    difficulty_id;
+
+
+-- join tables --
+SELECT recipe.recipe_id, recipe.recipe_name, recipe.recipe_notes,
+		ingredient.ingredient, instructions.instructions, difficulty.difficulty, cuisine.cuisine,
+		course.course, diet.diet
+		FROM recipe_ingredient
+                INNER JOIN recipe ON recipe.recipe_id = recipe_ingredient.recipe_id
+                INNER JOIN ingredient ON ingredient.ingredient_id = recipe_ingredient.ingredient_id
+                INNER JOIN instructions ON instructions.instruction_id = recipe.instructions_id
+                INNER JOIN difficulty ON difficulty.difficulty_id = recipe.difficulty_id
+                INNER JOIN cuisine ON cuisine.cuisine_id = recipe.cuisine_id
+                INNER JOIN course ON course.course_id = recipe.course_id
+                INNER JOIN diet ON diet.diet_id = recipe.diet_id;
+                
+-- display only vegan options--
+SELECT  recipe.recipe_id, recipe.recipe_name,
+		ingredient.ingredient, instructions.instructions, diet.diet
+		FROM recipe_ingredient
+                INNER JOIN recipe ON recipe.recipe_id = recipe_ingredient.recipe_id
+                INNER JOIN ingredient ON ingredient.ingredient_id = recipe_ingredient.ingredient_id
+                INNER JOIN instructions ON instructions.instruction_id = recipe.instructions_id
+                INNER JOIN diet ON diet.diet_id = recipe.diet_id
+                WHERE diet.diet = "Vegan";
+
+
+-- display recipes that use flour options--
+SELECT  recipe.recipe_id, recipe.recipe_name,
+		ingredient.ingredient, instructions.instructions, diet.diet
+		FROM recipe_ingredient
+                INNER JOIN recipe ON recipe.recipe_id = recipe_ingredient.recipe_id
+                INNER JOIN ingredient ON ingredient.ingredient_id = recipe_ingredient.ingredient_id
+                INNER JOIN instructions ON instructions.instruction_id = recipe.instructions_id
+                INNER JOIN diet ON diet.diet_id = recipe.diet_id
+                WHERE ingredient.ingredient = "flour";
